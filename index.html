@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>숨 체험단 달력</title>
+<meta name="description" content="체험단 선정 발표 확인일과 리뷰 마감일을 한눈에 보는 달력">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="숨 체험단 달력">
+<meta name="theme-color" content="#F4F4F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F0F16" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#F3F3F9;
+  --surface:#FFFFFF;
+  --surface-2:#F7F7FC;
+  --surface-3:#EDEDF6;
+  --ink:#181824;
+  --ink-2:#5D5D74;
+  --ink-3:#8C8CA3;
+  --line:#E5E5F0;
+  --ann:#4A5AD8;
+  --ann-soft:#EBEEFD;
+  --dead:#DC4B36;
+  --dead-soft:#FFEFEB;
+  --accent:#5B4FD6;
+  --accent-fill:#5B4FD6;
+  --on-accent:#FFFFFF;
+  --accent-soft:#EEECFE;
+  --p-dq:#C2457E;   --p-dq-bg:#FDECF3;
+  --p-pb:#2C8459;   --p-pb-bg:#E8F6EE;
+  --p-rn:#3B6FD4;   --p-rn-bg:#EAF0FE;
+  --p-gn:#A2600F;   --p-gn-bg:#FDF2E1;
+  --shadow:0 1px 2px rgba(24,24,36,.04), 0 10px 28px rgba(24,24,36,.07);
+  --shadow-sm:0 1px 2px rgba(24,24,36,.05);
+  --radius:20px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0E0E15;
+    --surface:#191922;
+    --surface-2:#20202C;
+    --surface-3:#2A2A38;
+    --ink:#F2F2F8;
+    --ink-2:#ADADC2;
+    --ink-3:#82829A;
+    --line:#2B2B39;
+    --ann:#9FA9FF;
+    --ann-soft:#1F2444;
+    --dead:#FF9583;
+    --dead-soft:#3A201C;
+    --accent:#A79EFF;
+    --accent-fill:#6C5CE7;
+    --on-accent:#FFFFFF;
+    --accent-soft:#272048;
+    --p-dq:#F58BB9;   --p-dq-bg:#3A1B2A;
+    --p-pb:#74D3A2;   --p-pb-bg:#15302A;
+    --p-rn:#94B4FF;   --p-rn-bg:#1B2545;
+    --p-gn:#E7B36A;   --p-gn-bg:#332614;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 30px rgba(0,0,0,.4);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.35);
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;
+  font-size:15px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  padding:0 0 calc(40px + env(safe-area-inset-bottom));
+}
+button{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:980px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 14px 0}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;
+  overflow:hidden;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px 18px 16px;
+  box-shadow:var(--shadow);
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:-60% -20% auto auto;
+  width:280px;height:280px;
+  background:radial-gradient(circle at center,rgba(91,79,214,.20),rgba(91,79,214,0) 65%);
+  pointer-events:none;
+}
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:auto auto -70% -30%;
+  width:260px;height:260px;
+  background:radial-gradient(circle at center,rgba(220,75,54,.14),rgba(220,75,54,0) 65%);
+  pointer-events:none;
+}
+.hero-top{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+h1{
+  margin:0;
+  font-size:25px;
+  font-weight:800;
+  letter-spacing:-.03em;
+  line-height:1.2;
+}
+h1 .thin{color:var(--ink-2);font-weight:700}
+.today-pill{
+  flex:0 0 auto;
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 9px;
+  font-size:11.5px;font-weight:700;letter-spacing:-.01em;
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-radius:999px;
+  white-space:nowrap;
+}
+.hero-sub{margin:7px 0 0;font-size:13px;color:var(--ink-2);letter-spacing:-.01em}
+
+/* ---------- summary ---------- */
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.sum-card{
+  position:relative;
+  text-align:left;
+  appearance:none;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px 13px 11px;
+  box-shadow:var(--shadow-sm);
+  display:flex;flex-direction:column;gap:2px;
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.sum-card:active{transform:scale(.985)}
+.sum-label{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:var(--ink-2);letter-spacing:-.01em}
+.sum-value{font-size:24px;font-weight:800;letter-spacing:-.04em;line-height:1.15;font-variant-numeric:tabular-nums}
+.sum-value small{font-size:12px;font-weight:700;color:var(--ink-2);margin-left:1px;letter-spacing:0}
+.sum-value.is-text{font-size:15px;letter-spacing:-.02em;line-height:1.35;margin-top:1px}
+.sum-meta{font-size:11px;color:var(--ink-3);letter-spacing:-.01em;line-height:1.35}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.dot-ann{background:var(--ann)}
+.dot-dead{background:var(--dead)}
+.dot-accent{background:var(--accent)}
+
+/* ---------- tabs ---------- */
+.tabs{
+  position:sticky;
+  top:0;
+  z-index:30;
+  display:flex;gap:4px;
+  margin:12px -14px 0;
+  padding:calc(8px + env(safe-area-inset-top, 0px)) 14px 8px;
+  background:var(--bg);
+  background:color-mix(in srgb, var(--bg) 84%, transparent);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid transparent;
+  transition:border-color .2s ease;
+}
+.tabs.is-stuck{border-bottom-color:var(--line)}
+.tab{
+  flex:1 1 0;
+  appearance:none;
+  border:1px solid transparent;
+  background:var(--surface);
+  color:var(--ink-2);
+  border-radius:12px;
+  padding:9px 4px;
+  font-size:12.5px;
+  font-weight:700;
+  letter-spacing:-.02em;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  white-space:nowrap;
+  cursor:pointer;
+  box-shadow:var(--shadow-sm);
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+}
+.tab .tab-count{
+  font-size:10.5px;font-weight:800;
+  padding:1px 5px;border-radius:999px;
+  background:var(--surface-3);color:var(--ink-2);
+  font-variant-numeric:tabular-nums;
+}
+.tab.is-active{background:var(--accent-fill);color:var(--on-accent);border-color:transparent;box-shadow:0 6px 16px rgba(91,79,214,.28)}
+.tab.is-active .tab-count{background:rgba(255,255,255,.22);color:#fff}
+.tab.is-active .dot{background:#fff}
+
+/* ---------- months ---------- */
+.months{display:grid;gap:14px;margin-top:14px}
+.cal-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:14px 12px 12px;
+  box-shadow:var(--shadow);
+  scroll-margin-top:calc(64px + env(safe-area-inset-top, 0px));
+}
+.cal-head{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:0 3px 10px}
+.cal-head h2{margin:0;font-size:16px;font-weight:800;letter-spacing:-.03em;display:flex;align-items:baseline;gap:5px}
+.m-num{font-size:23px;font-weight:800;letter-spacing:-.04em}
+.m-year{font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:0}
+.cal-sub{margin:2px 0 0;font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:9px;font-size:10.5px;color:var(--ink-2);font-weight:600;padding-bottom:2px;white-space:nowrap}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.weekdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:0 2px 5px}
+.weekdays span{text-align:center;font-size:10.5px;font-weight:700;color:var(--ink-3)}
+.weekdays span.sun{color:var(--dead)}
+.weekdays span.sat{color:var(--ann)}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:0 2px}
+.cell{
+  position:relative;
+  appearance:none;
+  border:1px solid transparent;
+  min-height:52px;
+  border-radius:11px;
+  background:transparent;
+  padding:5px 1px 4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;
+  cursor:pointer;
+  transition:background .12s ease, box-shadow .15s ease, transform .1s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.cell .num{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+.cell.is-out{cursor:default;opacity:.32}
+.cell.is-out .num{font-size:11px;font-weight:600;color:var(--ink-3)}
+.cell .badges{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%}
+.b{
+  display:inline-flex;align-items:center;gap:2px;
+  font-size:9px;font-weight:800;line-height:1;
+  padding:2px 3.5px;border-radius:5px;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;
+}
+.b i{display:block;width:3px;height:3px;border-radius:50%;background:currentColor;opacity:.85}
+.b-ann{background:var(--ann-soft);color:var(--ann)}
+.b-dead{background:var(--dead-soft);color:var(--dead)}
+.cell.has-ann{background:var(--ann-soft)}
+.cell.has-dead{background:var(--dead-soft)}
+.cell.has-ann.has-dead{background:linear-gradient(140deg,var(--ann-soft) 0 50%,var(--dead-soft) 50% 100%)}
+.cell:not(.is-out):active{transform:scale(.94)}
+.cell.is-today{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+.cell.is-today .num{color:var(--accent)}
+.today-tag{font-size:8.5px;font-weight:800;line-height:1;color:var(--accent);letter-spacing:-.02em;margin-top:2px}
+.cell.is-sel{box-shadow:0 0 0 2px var(--accent-fill), 0 4px 12px rgba(91,79,214,.25);z-index:1}
+.cell.is-sel .num{color:var(--accent)}
+.cell.is-dim{opacity:.5}
+.cal-card.is-collapsed{padding-bottom:16px}
+.cal-card.is-collapsed .weekdays,
+.cal-card.is-collapsed .grid,
+.cal-card.is-collapsed .legend{display:none}
+
+/* ---------- detail ---------- */
+.detail{margin:12px 2px 0;border-top:1px dashed var(--line);padding-top:12px;animation:rise .18s ease both}
+.detail[hidden]{display:none}
+@keyframes rise{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.dhead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.dhead h3{margin:0;font-size:16px;font-weight:800;letter-spacing:-.03em}
+.dhead p{margin:2px 0 0;font-size:11.5px;color:var(--ink-3);font-weight:600}
+.dclose{
+  appearance:none;border:1px solid var(--line);background:var(--surface-2);
+  width:28px;height:28px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--ink-3);cursor:pointer;flex:0 0 auto;
+}
+.dsec + .dsec{margin-top:12px}
+.dsec-head{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ink-2);letter-spacing:-.01em;margin-bottom:7px}
+.dsec-head .dsec-count{margin-left:auto;font-size:10.5px;font-weight:800;color:var(--ann);background:var(--ann-soft);padding:2px 6px;border-radius:999px;font-variant-numeric:tabular-nums}
+.dsec-note{margin:-2px 0 8px;font-size:11px;line-height:1.45;color:var(--ink-3);background:var(--surface-2);border-radius:8px;padding:6px 8px}
+.ann-list{display:flex;flex-direction:column;gap:6px}
+.ann{
+  display:flex;align-items:flex-start;gap:8px;
+  background:var(--surface-2);
+  border:1px solid transparent;
+  border-radius:12px;
+  padding:9px 10px;
+  transition:border-color .15s ease, background .15s ease;
+}
+.ann:hover{border-color:var(--line)}
+.ann:active{background:var(--surface-3)}
+.ann-main{display:block;flex:1 1 auto;min-width:0}
+.ann-name{display:block;font-size:13.5px;font-weight:700;letter-spacing:-.02em;line-height:1.3;word-break:keep-all}
+.ann-benefit{display:block;font-size:12px;color:var(--ink-2);margin-top:1px;letter-spacing:-.01em;word-break:keep-all}
+.ann-note{display:block;font-size:10.5px;color:var(--ink-3);margin-top:2px;line-height:1.35;word-break:keep-all}
+.ann-side{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:5px;padding-top:1px}
+.ann-go{font-size:10px;font-weight:800;color:var(--accent);white-space:nowrap}
+.chip{display:inline-flex;align-items:center;font-size:9.5px;font-weight:800;padding:2.5px 6px;border-radius:6px;letter-spacing:-.02em;white-space:nowrap}
+.p-dq{background:var(--p-dq-bg);color:var(--p-dq)}
+.p-pb{background:var(--p-pb-bg);color:var(--p-pb)}
+.p-rn{background:var(--p-rn-bg);color:var(--p-rn)}
+.p-gn{background:var(--p-gn-bg);color:var(--p-gn)}
+.p-etc{background:var(--surface-3);color:var(--ink-2)}
+
+.dead{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:11px 12px 12px;
+}
+.dead + .dead{margin-top:8px}
+.dead-head{display:flex;gap:9px;align-items:flex-start}
+.dead-emoji{
+  flex:0 0 auto;width:34px;height:34px;border-radius:11px;
+  background:var(--surface);border:1px solid var(--line);
+  display:inline-flex;align-items:center;justify-content:center;font-size:17px;
+}
+.dead-title{min-width:0}
+.dead-name{font-size:14px;font-weight:800;letter-spacing:-.03em;line-height:1.3}
+.dead-sub{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:3px;font-size:11px;color:var(--ink-2);font-weight:600}
+.dday{font-size:10.5px;font-weight:800;color:var(--dead);background:var(--dead-soft);padding:1.5px 6px;border-radius:999px;font-variant-numeric:tabular-nums}
+.dday.is-past{color:var(--ink-3);background:var(--surface-3)}
+.kv{margin:10px 0 0;display:grid;gap:5px}
+.kv > div{display:grid;grid-template-columns:78px 1fr;gap:8px;align-items:start}
+.kv dt{font-size:10.5px;font-weight:700;color:var(--ink-3);padding-top:1px}
+.kv dd{margin:0;font-size:12px;color:var(--ink);line-height:1.45;letter-spacing:-.01em;word-break:keep-all}
+.kv dd a{color:var(--accent);font-weight:700}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:11px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  min-height:38px;border-radius:11px;
+  font-size:12.5px;font-weight:800;letter-spacing:-.02em;
+  border:1px solid transparent;
+  transition:transform .1s ease,opacity .15s ease;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent-fill);color:var(--on-accent);box-shadow:0 4px 12px rgba(91,79,214,.24)}
+.btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.empty{
+  text-align:center;padding:18px 10px;
+  font-size:12.5px;color:var(--ink-3);
+}
+.empty strong{display:block;font-size:13.5px;color:var(--ink-2);margin-bottom:3px}
+
+/* ---------- filter list ---------- */
+.filter-list{margin-top:14px}
+.fl-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 4px 9px}
+.fl-head h2{margin:0;font-size:15.5px;font-weight:800;letter-spacing:-.03em;display:flex;align-items:center;gap:6px}
+.fl-head span{font-size:11px;color:var(--ink-3);font-weight:600}
+.fl-group + .fl-group{margin-top:10px}
+.fl-date{display:flex;align-items:center;gap:7px;padding:0 4px 6px;font-size:12px;font-weight:800;color:var(--ink-2)}
+.fl-date .dday{margin-left:auto}
+.fl-date .when{font-weight:600;color:var(--ink-3);font-size:11px}
+.foot{margin:22px 2px 0;padding-top:14px;border-top:1px solid var(--line);color:var(--ink-3);font-size:11px;line-height:1.6;letter-spacing:-.01em}
+.foot p{margin:0 0 5px;word-break:keep-all}
+.foot .tip{display:flex;gap:6px;align-items:flex-start;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin-top:10px;font-size:11px}
+.foot .meta{color:var(--ink-3);font-variant-numeric:tabular-nums;opacity:.85}
+
+@media (max-width:359px){
+  h1{font-size:21px}
+  .today-pill{font-size:10.5px;padding:4px 8px}
+  .hero{padding:15px 14px 14px}
+  .sum-value{font-size:22px}
+}
+@media (min-width:520px){
+  .wrap{padding-left:20px;padding-right:20px}
+  .summary{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .sum-value{font-size:23px}
+  .cell{min-height:60px}
+  .cell .num{font-size:14px}
+  .b{font-size:10px;padding:2.5px 4.5px}
+  .grid,.weekdays{gap:6px}
+}
+@media (min-width:860px){
+  .months{grid-template-columns:1fr 1fr;align-items:start}
+  .cal-card{position:relative}
+  h1{font-size:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <noscript><p style="background:#FFF0EE;color:#B33A2A;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;margin:0 0 12px">자바스크립트를 켜면 날짜별 일정이 펼쳐져요.</p></noscript>
+
+  <header class="hero">
+    <div class="hero-top">
+      <h1>숨 <span class="thin">체험단 달력</span></h1>
+      <span class="today-pill" id="todayPill">오늘</span>
+    </div>
+    <p class="hero-sub">발표 확인일과 리뷰 마감을 한 화면에 모았어요. 날짜를 눌러보세요.</p>
+  </header>
+
+  <section class="summary" aria-label="요약">
+    <button type="button" class="sum-card" data-jump="red">
+      <span class="sum-label"><i class="dot dot-dead"></i>당첨 진행 중</span>
+      <strong class="sum-value" id="sumWon">5<small>곳</small></strong>
+      <span class="sum-meta" id="sumWonMeta">리뷰 마감 12/03 ~ 12/11</span>
+    </button>
+    <button type="button" class="sum-card" data-jump="ann">
+      <span class="sum-label"><i class="dot dot-ann"></i>발표 대기</span>
+      <strong class="sum-value" id="sumWait">26<small>건</small></strong>
+      <span class="sum-meta" id="sumWaitMeta">확인일 7일 · 11/21 ~ 11/29</span>
+    </button>
+    <button type="button" class="sum-card" data-jump="red">
+      <span class="sum-label"><i class="dot dot-accent"></i>가장 임박한 마감</span>
+      <strong class="sum-value" id="sumNextDead">-</strong>
+      <span class="sum-meta" id="sumNextDeadMeta">-</span>
+    </button>
+    <button type="button" class="sum-card" data-jump="ann">
+      <span class="sum-label"><i class="dot dot-accent"></i>다음 발표</span>
+      <strong class="sum-value is-text" id="sumNextAnn">-</strong>
+      <span class="sum-meta" id="sumNextAnnMeta">-</span>
+    </button>
+  </section>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="보기 필터">
+    <button type="button" class="tab is-active" data-filter="all" role="tab" aria-selected="true">전체 달력</button>
+    <button type="button" class="tab" data-filter="red" role="tab" aria-selected="false"><i class="dot dot-dead"></i>당첨 마감 <span class="tab-count" id="tabRedCount">5</span></button>
+    <button type="button" class="tab" data-filter="blue" role="tab" aria-selected="false"><i class="dot dot-ann"></i>발표 대기 <span class="tab-count" id="tabBlueCount">26</span></button>
+  </nav>
+
+  <main>
+    <div class="months">
+      <section class="cal-card" id="cal-2026-11">
+        <div class="cal-head">
+          <div>
+            <h2><span class="m-num">11</span>월 <span class="m-year">2026</span></h2>
+            <p class="cal-sub" id="sub-2026-11">-</p>
+          </div>
+          <div class="legend"><span><i class="dot dot-ann"></i>발표</span><span><i class="dot dot-dead"></i>마감</span></div>
+        </div>
+        <div class="weekdays" aria-hidden="true">
+          <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
+        </div>
+        <div class="grid" id="grid-2026-11" role="group" aria-label="2026년 11월 달력"></div>
+        <div class="detail" id="detail-2026-11" hidden></div>
+      </section>
+
+      <section class="cal-card" id="cal-2026-12">
+        <div class="cal-head">
+          <div>
+            <h2><span class="m-num">12</span>월 <span class="m-year">2026</span></h2>
+            <p class="cal-sub" id="sub-2026-12">-</p>
+          </div>
+          <div class="legend"><span><i class="dot dot-ann"></i>발표</span><span><i class="dot dot-dead"></i>마감</span></div>
+        </div>
+        <div class="weekdays" aria-hidden="true">
+          <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
+        </div>
+        <div class="grid" id="grid-2026-12" role="group" aria-label="2026년 12월 달력"></div>
+        <div class="detail" id="detail-2026-12" hidden></div>
+      </section>
+    </div>
+
+    <section class="filter-list" id="filterList" hidden></section>
+
+    <footer class="foot">
+      <p>발표 결과는 플랫폼 사정에 따라 늦게 올라올 수 있어요. 당일 결과가 없으면 다음 확인 시각에 다시 봐주세요.</p>
+      <p>레뷰는 현재 대기 0건으로 집계돼 이 달력에 넣지 않았어요.</p>
+      <p class="meta">기준 2026-11-20(금) 18:45 · 캠페인 정보는 각 플랫폼 공고 기준</p>
+      <p class="tip"><span aria-hidden="true">📲</span><span>아이폰 사파리에서 <b>공유 → 홈 화면에 추가</b>를 누르면 앱처럼 열려요.</span></p>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------------- data ---------------- */
+  var DATA = {
+    deadlines: [
+      {
+        date: '2026-12-03', emoji: '🥃', name: '오늘의위스키 영등포점 19차', platform: '디너의여왕',
+        benefit: '3만원 식사권(2인)', hours: '매일 19:00~24:00 · 예약 필수',
+        possible: '11/21(토)부터 아무 날', phones: ['010-7357-9937'],
+        url: 'https://dinnerqueen.net/taste/1644179'
+      },
+      {
+        date: '2026-12-04', emoji: '📸', name: '오찬석 사진공방', platform: '리뷰노트',
+        benefit: '증명사진 풀패키지(3만원 상당)', hours: '화~토 11:00~21:00 (일·월 불가) · 100% 예약제, 당일 예약·방문 불가',
+        possible: '11/21(토), 24(화)~28(토)', phones: ['010-4232-3697'],
+        url: 'https://www.reviewnote.co.kr/campaigns/1539613'
+      },
+      {
+        date: '2026-12-06', emoji: '🍶', name: '소복식당 48차', platform: '포블로그',
+        benefit: '5만원 식사권(주류 주문 필수)', hours: '월~목 18:00~23:00 (금·토 체험불가·일 휴무) · 최소 하루 전 예약',
+        possible: '11/23(월)~26(목)', phones: ['070-8657-4105', '010-7454-3199'],
+        url: 'https://4blog.net/campaign/372074/'
+      },
+      {
+        date: '2026-12-10', emoji: '🍗', name: '여의도 숯닭', platform: '강남맛집',
+        benefit: '닭갈비 1인분 + 닭목살 1인분(2인)', hours: '월~목 18:30 이후 · 방문 2~3일 전 예약 필수',
+        possible: '11/24(화)~26(목)', phones: ['010-8100-3433'],
+        url: 'https://xn--939au0g4vj8sq.net/cp/?id=2358009'
+      },
+      {
+        date: '2026-12-11', emoji: '🍺', name: '고물라디오', platform: '강남맛집',
+        benefit: '2만 5천원 체험권(2인)', hours: '목·금·토 19:00부터 · 방문 2~3일 전 예약 필수',
+        possible: '11/26(목)·27(금)·28(토)', phones: ['0507-1490-1004'],
+        url: 'https://xn--939au0g4vj8sq.net/cp/?id=2359181'
+      }
+    ],
+    announcements: [
+      {
+        date: '2026-11-21', time: '09:00',
+        note: '11/20 18시 기준 ‘선정중’ 상태 — 최종 확인이 필요해요.',
+        items: [
+          { name: '교동전선생 여의도에스트래뉴점', platform: '강남맛집', benefit: '5만원 체험권(2인)', note: '리뷰 11/21~12/11', url: 'https://xn--939au0g4vj8sq.net/cp/?id=2358740' }
+        ]
+      },
+      {
+        date: '2026-11-22', time: '18:00',
+        items: [
+          { name: '양키스그릴 문래점 (r) 35차', platform: '포블로그', benefit: '5만원', note: '클립+영수증리뷰 2건 · 체험 11/23~11/29', url: 'https://4blog.net/campaign/415101/' },
+          { name: '수내닭꼬치 까치산역점', platform: '리뷰노트', benefit: '45,000원', note: '19:00~23:00', url: 'https://www.reviewnote.co.kr/campaigns/1532826' },
+          { name: '역전소금구이', platform: '리뷰노트', benefit: '8만원 쿠폰', note: '', url: 'https://www.reviewnote.co.kr/campaigns/1535468' }
+        ]
+      },
+      {
+        date: '2026-11-24', time: '18:00',
+        items: [
+          { name: '두툼한숯불생고기 12차', platform: '디너의여왕', benefit: '4.5만원', note: '평일 17:30~20:00 (금·주말 불가)', url: 'https://dinnerqueen.net/taste/1650184' },
+          { name: '일식비 7차', platform: '디너의여왕', benefit: '7만원 상당 회 정식 2인', note: '평일 17:30~19:30', url: 'https://dinnerqueen.net/taste/1650931' },
+          { name: '곱 문래본점 8차', platform: '포블로그', benefit: '6만원', note: '월~목 16:00~22:00 · 네이버 예약 필수', url: 'https://4blog.net/campaign/404076/' },
+          { name: '해돈식당 17차', platform: '포블로그', benefit: '8만원', note: '토·일 불가 · 네이버 예약만 · 17:00~19:30', url: 'https://4blog.net/campaign/411034/' },
+          { name: '신.주.옥.미 분당금곡점 6차', platform: '포블로그', benefit: '4만원', note: '평일 15:30~20:00', url: 'https://4blog.net/campaign/405931/' },
+          { name: '우대포 여의도점', platform: '리뷰노트', benefit: '40,000원', note: '', url: 'https://www.reviewnote.co.kr/campaigns/1540210' },
+          { name: '여의도우삼겹집', platform: '리뷰노트', benefit: '35,000원', note: '', url: 'https://www.reviewnote.co.kr/campaigns/1545513' }
+        ]
+      },
+      {
+        date: '2026-11-25', time: '18:00',
+        items: [
+          { name: '삼해집 영등포점', platform: '강남맛집', benefit: '4만원(2인)', note: '일~목 12~21시 (금·토 불가) · 2~3일 전 예약 필수', url: 'https://xn--939au0g4vj8sq.net/cp/?id=2362827' },
+          { name: '디스코서울 123차', platform: '디너의여왕', benefit: '4만원', note: '메인1+1인1주류 필수 · 문자 예약', url: 'https://dinnerqueen.net/taste/1653742' },
+          { name: '수묵장어 5차', platform: '포블로그', benefit: '장어 2인분 + 사이드 1', note: '최소 2일 전 예약', url: 'https://4blog.net/campaign/410785/' }
+        ]
+      },
+      {
+        date: '2026-11-27', time: '18:00',
+        items: [
+          { name: '분당칼국수 63차', platform: '포블로그', benefit: '4만원', note: '평일 11:00~20:30 (12~13시·주말 불가)', url: 'https://4blog.net/campaign/399357/' },
+          { name: '월화고기 문래 8차', platform: '포블로그', benefit: '5만원', note: '평일 16:00~17:30 · 주말 11:30~17:00', url: 'https://4blog.net/campaign/404215/' },
+          { name: '한길양평해장국 문래점 8차', platform: '포블로그', benefit: '3만원', note: '17:30~20:00 · 선정 후 3일 내 네이버 예약', url: 'https://4blog.net/campaign/404263/' },
+          { name: '느루집 문래점 8차', platform: '포블로그', benefit: '커플세트 4.5만', note: '월~목·일 18:30까지 (금·토 불가)', url: 'https://4blog.net/campaign/404292/' },
+          { name: '멍텅구리꼼장어막창 구로구신도림점', platform: '리뷰노트', benefit: '50,000원(주류 포함)', note: '', url: 'https://www.reviewnote.co.kr/campaigns/1541329' },
+          { name: '문래주주객반', platform: '리뷰노트', benefit: '30,000원 자유 금액권', note: '', url: 'https://www.reviewnote.co.kr/campaigns/1541733' },
+          { name: '사랑골길', platform: '리뷰노트', benefit: '5만원', note: '수요일 17:30~21:00', url: 'https://www.reviewnote.co.kr/campaigns/1542991' },
+          { name: '칼누들바 영등포점', platform: '리뷰노트', benefit: '4만원', note: '', url: 'https://www.reviewnote.co.kr/campaigns/1543208' }
+        ]
+      },
+      {
+        date: '2026-11-28', time: '18:00',
+        items: [
+          { name: '코지로오모테나시 선유도점', platform: '리뷰노트', benefit: '5만원 자유이용권(주류 포함)', note: '', url: 'https://www.reviewnote.co.kr/campaigns/1543050' },
+          { name: '너와집 외교빌딩점', platform: '리뷰노트', benefit: '고추장오겹살 53,000원 + 10,000P', note: '', url: 'https://www.reviewnote.co.kr/campaigns/1543370' },
+          { name: '야키톤 톤토로 본점', platform: '리뷰노트', benefit: '3만원', note: '', url: 'https://www.reviewnote.co.kr/campaigns/1552025' }
+        ]
+      },
+      {
+        date: '2026-11-29', time: '18:00',
+        items: [
+          { name: '대박곱창구이', platform: '리뷰노트', benefit: '6만원', note: '11/24~28 휴무', url: 'https://www.reviewnote.co.kr/campaigns/1547057' }
+        ]
+      }
+    ]
+  };
+
+  /* ---------------- helpers ---------------- */
+  var WD = ['일', '월', '화', '수', '목', '금', '토'];
+  var MONTHS = [[2026, 11], [2026, 12]];
+  var DAY_MS = 86400000;
+  var nEl = function (id) { return document.getElementById(id); };
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function keyOf(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function parseKey(s) {
+    var p = s.split('-');
+    return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  }
+  function md(s) {
+    var p = s.split('-');
+    return Number(p[1]) + '/' + p[2];
+  }
+  function fullLabel(s) {
+    var d = parseKey(s);
+    return (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + WD[d.getDay()] + ')';
+  }
+  function shortLabel(s) {
+    var d = parseKey(s);
+    return (d.getMonth() + 1) + '/' + pad2(d.getDate()) + '(' + WD[d.getDay()] + ')';
+  }
+  function diffFromToday(s) {
+    return Math.round((parseKey(s) - today) / DAY_MS);
+  }
+  function dday(s) {
+    var n = diffFromToday(s);
+    if (n === 0) return 'D-DAY';
+    if (n > 0) return 'D-' + n;
+    return 'D+' + Math.abs(n);
+  }
+  function digits(p) { return p.replace(/[^0-9+]/g, ''); }
+  function platClass(p) {
+    var map = { '디너의여왕': 'p-dq', '포블로그': 'p-pb', '리뷰노트': 'p-rn', '강남맛집': 'p-gn' };
+    return map[p] || 'p-etc';
+  }
+
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  var annMap = {};
+  DATA.announcements.forEach(function (g) { annMap[g.date] = g; });
+  var deadMap = {};
+  DATA.deadlines.forEach(function (d) {
+    (deadMap[d.date] = deadMap[d.date] || []).push(d);
+  });
+
+  var annDates = DATA.announcements.map(function (g) { return g.date; }).sort();
+  var deadDates = Object.keys(deadMap).sort();
+  var annTotal = DATA.announcements.reduce(function (a, g) { return a + g.items.length; }, 0);
+
+  var filter = 'all';   /* all | red | blue */
+  var selected = null;  /* 'YYYY-MM-DD' */
+
+  /* ---------------- summary ---------------- */
+  function renderSummary() {
+    nEl('todayPill').textContent = '오늘 ' + (today.getMonth() + 1) + '/' + pad2(today.getDate()) + ' (' + WD[today.getDay()] + ')';
+
+    nEl('sumWon').innerHTML = DATA.deadlines.length + '<small>곳</small>';
+    if (deadDates.length) {
+      nEl('sumWonMeta').textContent = '리뷰 마감 ' + md(deadDates[0]) + ' ~ ' + md(deadDates[deadDates.length - 1]);
+    }
+    nEl('sumWait').innerHTML = annTotal + '<small>건</small>';
+    nEl('sumWaitMeta').textContent = '확인일 ' + annDates.length + '일 · ' + md(annDates[0]) + ' ~ ' + md(annDates[annDates.length - 1]);
+    nEl('tabRedCount').textContent = DATA.deadlines.length;
+    nEl('tabBlueCount').textContent = annTotal;
+
+    /* nearest upcoming deadline (falls back to the last one) */
+    var nextDead = null;
+    for (var i = 0; i < DATA.deadlines.length; i++) {
+      if (diffFromToday(DATA.deadlines[i].date) >= 0) { nextDead = DATA.deadlines[i]; break; }
+    }
+    if (!nextDead) nextDead = DATA.deadlines[DATA.deadlines.length - 1];
+    if (nextDead) {
+      var past = diffFromToday(nextDead.date) < 0;
+      nEl('sumNextDead').textContent = past ? '마감 완료' : dday(nextDead.date);
+      nEl('sumNextDeadMeta').textContent = nextDead.name + ' · ' + md(nextDead.date) + '(' + WD[parseKey(nextDead.date).getDay()] + ')';
+      nEl('sumNextDead').classList.toggle('is-text', past);
+    }
+
+    /* next announcement day */
+    var nextAnn = null;
+    for (var j = 0; j < DATA.announcements.length; j++) {
+      if (diffFromToday(DATA.announcements[j].date) >= 0) { nextAnn = DATA.announcements[j]; break; }
+    }
+    if (!nextAnn) nextAnn = DATA.announcements[DATA.announcements.length - 1];
+    if (nextAnn) {
+      var n = diffFromToday(nextAnn.date);
+      var when = n === 0 ? '오늘 ' + nextAnn.time : (n === 1 ? '내일 ' + nextAnn.time : shortLabel(nextAnn.date));
+      nEl('sumNextAnn').textContent = when;
+      var plats = {};
+      nextAnn.items.forEach(function (it) { plats[it.platform] = 1; });
+      nEl('sumNextAnnMeta').textContent = nextAnn.items.length + '건 · ' + Object.keys(plats).join(' · ');
+    }
+  }
+
+  /* ---------------- calendar ---------------- */
+  function cellHTML(y, m, day) {
+    var d = new Date(y, m - 1, day);
+    var k = keyOf(d);
+    var ann = annMap[k];
+    var dead = deadMap[k] || [];
+    var annCount = ann ? ann.items.length : 0;
+    var deadCount = dead.length;
+    var showAnn = annCount > 0 && filter !== 'red';
+    var showDead = deadCount > 0 && filter !== 'blue';
+
+    var cls = ['cell'];
+    if (k === keyOf(today)) cls.push('is-today');
+    if (k === selected) cls.push('is-sel');
+    if (showAnn) cls.push('has-ann');
+    if (showDead) cls.push('has-dead');
+    if ((filter === 'red' && !deadCount) || (filter === 'blue' && !annCount)) cls.push('is-dim');
+
+    var labels = [];
+    if (annCount) labels.push('발표 ' + annCount + '건');
+    if (deadCount) labels.push('리뷰 마감 ' + deadCount + '곳');
+
+    var badges = '';
+    if (showAnn) badges += '<span class="b b-ann"><i></i>' + annCount + '</span>';
+    if (showDead) badges += '<span class="b b-dead"><i></i>' + deadCount + '</span>';
+    if (!badges && k === keyOf(today)) badges = '<span class="today-tag">오늘</span>';
+
+    var aria = m + '월 ' + day + '일 ' + WD[d.getDay()] + '요일' +
+      (labels.length ? ', ' + labels.join(', ') : ', 일정 없음') +
+      (k === keyOf(today) ? ', 오늘' : '');
+
+    return '<button type="button" class="' + cls.join(' ') + '" data-date="' + k + '" aria-label="' + aria + '"' +
+      (k === selected ? ' aria-pressed="true"' : '') + '>' +
+      '<span class="num">' + day + '</span>' +
+      '<span class="badges">' + badges + '</span>' +
+      '</button>';
+  }
+
+  function monthCells(y, m) {
+    var first = new Date(y, m - 1, 1);
+    var offset = first.getDay();
+    var days = new Date(y, m, 0).getDate();
+    var total = Math.ceil((offset + days) / 7) * 7;
+    var out = '';
+    for (var i = 0; i < total; i++) {
+      var dayNum = i - offset + 1;
+      if (dayNum < 1 || dayNum > days) {
+        var edge = new Date(y, m - 1, dayNum);
+        out += '<span class="cell is-out" aria-hidden="true"><span class="num">' + edge.getDate() + '</span></span>';
+        continue;
+      }
+      out += cellHTML(y, m, dayNum);
+    }
+    return out;
+  }
+
+  function monthSub(y, m) {
+    var prefix = y + '-' + pad2(m) + '-';
+    if (filter === 'red') {
+      var c = deadDates.filter(function (k) { return k.indexOf(prefix) === 0; }).length;
+      return '리뷰 마감 ' + c + '곳';
+    }
+    if (filter === 'blue') {
+      var days = annDates.filter(function (k) { return k.indexOf(prefix) === 0; });
+      var cnt = days.reduce(function (a, k) { return a + annMap[k].items.length; }, 0);
+      return '발표 확인 ' + days.length + '일 · ' + cnt + '건';
+    }
+    if (m === 11) {
+      return '발표 확인 ' + annDates.length + '일 · ' + annTotal + '건';
+    }
+    return '리뷰 마감 ' + DATA.deadlines.length + '곳';
+  }
+
+  /* ---------------- detail ---------------- */
+  function annBlock(g) {
+    var rows = g.items.map(function (it) {
+      return '<a class="ann" href="' + it.url + '" target="_blank" rel="noopener">' +
+        '<span class="ann-main">' +
+          '<span class="ann-name">' + it.name + '</span>' +
+          '<span class="ann-benefit">' + it.benefit + '</span>' +
+          (it.note ? '<span class="ann-note">' + it.note + '</span>' : '') +
+        '</span>' +
+        '<span class="ann-side">' +
+          '<span class="chip ' + platClass(it.platform) + '">' + it.platform + '</span>' +
+          '<span class="ann-go">열기 ↗</span>' +
+        '</span>' +
+      '</a>';
+    }).join('');
+    return '<div class="dsec">' +
+      '<div class="dsec-head"><i class="dot dot-ann"></i><span>발표 확인 ' + g.time + '</span>' +
+        '<span class="dsec-count">' + g.items.length + '건</span></div>' +
+      (g.note ? '<p class="dsec-note">' + g.note + '</p>' : '') +
+      '<div class="ann-list">' + rows + '</div>' +
+    '</div>';
+  }
+
+  function deadCard(d) {
+    var dd = dday(d.date);
+    var past = diffFromToday(d.date) < 0;
+    var phoneLinks = d.phones.map(function (p) {
+      return '<a href="tel:' + digits(p) + '">' + p + '</a>';
+    }).join(' · ');
+    return '<article class="dead">' +
+      '<div class="dead-head">' +
+        '<span class="dead-emoji" aria-hidden="true">' + d.emoji + '</span>' +
+        '<div class="dead-title">' +
+          '<div class="dead-name">' + d.name + '</div>' +
+          '<div class="dead-sub">' + d.platform +
+            '<span>·</span><span>리뷰 마감 ' + shortLabel(d.date) + '</span>' +
+            '<span class="dday' + (past ? ' is-past' : '') + '">' + dd + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<dl class="kv">' +
+        '<div><dt>제공 내역</dt><dd>' + d.benefit + '</dd></div>' +
+        '<div><dt>방문 가능</dt><dd>' + d.hours + '</dd></div>' +
+        '<div><dt>이번 주 가능일</dt><dd>' + d.possible + '</dd></div>' +
+        '<div><dt>매장 전화</dt><dd>' + phoneLinks + '</dd></div>' +
+      '</dl>' +
+      '<div class="acts">' +
+        '<a class="btn btn-primary" href="' + d.url + '" target="_blank" rel="noopener">캠페인 바로가기 ↗</a>' +
+        '<a class="btn btn-ghost" href="tel:' + digits(d.phones[0]) + '">전화 걸기</a>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function detailHTML(k) {
+    var g = annMap[k];
+    var dead = deadMap[k] || [];
+    var showAnn = g && filter !== 'red';
+    var showDead = dead.length > 0 && filter !== 'blue';
+    var meta = [];
+    if (showAnn) meta.push('발표 확인 ' + g.time + ' · ' + g.items.length + '건');
+    if (showDead) meta.push('리뷰 마감 · ' + dday(k));
+    if (!meta.length) meta.push('일정 없음');
+
+    var html = '<div class="dhead">' +
+      '<div class="dhead-t"><h3>' + fullLabel(k) + '</h3><p>' + meta.join(' / ') + '</p></div>' +
+      '<button type="button" class="dclose" aria-label="닫기">✕</button>' +
+    '</div>';
+
+    if (showAnn) html += annBlock(g);
+    if (showDead) {
+      html += '<div class="dsec">' + dead.map(deadCard).join('') + '</div>';
+    }
+    if (!showAnn && !showDead) {
+      html += '<div class="empty"><strong>이 날은 일정이 없어요</strong>다른 날짜를 눌러보세요.</div>';
+    }
+    return html;
+  }
+
+  function monthHasItems(y, m) {
+    var prefix = y + '-' + pad2(m) + '-';
+    if (filter === 'red') {
+      return deadDates.some(function (k) { return k.indexOf(prefix) === 0; });
+    }
+    if (filter === 'blue') {
+      return annDates.some(function (k) { return k.indexOf(prefix) === 0; });
+    }
+    return true;
+  }
+
+  function renderMonths() {
+    MONTHS.forEach(function (ym) {
+      var y = ym[0], m = ym[1];
+      var mk = y + '-' + pad2(m);
+      var has = monthHasItems(y, m);
+      var card = nEl('cal-' + mk);
+      if (card) card.classList.toggle('is-collapsed', !has);
+      nEl('grid-' + mk).innerHTML = has ? monthCells(y, m) : '';
+      nEl('sub-' + mk).textContent = has ? monthSub(y, m) :
+        (filter === 'red' ? '이 달에는 리뷰 마감 일정이 없어요' : '이 달에는 발표 일정이 없어요');
+      var det = nEl('detail-' + mk);
+      if (selected && selected.indexOf(mk + '-') === 0) {
+        det.innerHTML = detailHTML(selected);
+        det.hidden = false;
+      } else {
+        det.innerHTML = '';
+        det.hidden = true;
+      }
+    });
+  }
+
+  /* ---------------- filter list ---------------- */
+  function renderFilterList() {
+    var box = nEl('filterList');
+    if (filter === 'all') {
+      box.hidden = true;
+      box.innerHTML = '';
+      return;
+    }
+    box.hidden = false;
+
+    if (filter === 'red') {
+      box.innerHTML = '<div class="fl-head"><h2><i class="dot dot-dead"></i>당첨 리뷰 마감 ' +
+        DATA.deadlines.length + '곳</h2><span>마감 임박순</span></div>' +
+        '<div class="fl-group">' + DATA.deadlines.map(deadCard).join('') + '</div>';
+      return;
+    }
+
+    var groups = DATA.announcements.map(function (g) {
+      return '<div class="fl-group">' +
+        '<div class="fl-date"><span>' + fullLabel(g.date) + '</span>' +
+          '<span class="when">' + g.time + ' · ' + g.items.length + '건</span>' +
+          '<span class="dday' + (diffFromToday(g.date) < 0 ? ' is-past' : '') + '">' + dday(g.date) + '</span>' +
+        '</div>' +
+        annBlock(g) +
+      '</div>';
+    }).join('');
+
+    box.innerHTML = '<div class="fl-head"><h2><i class="dot dot-ann"></i>발표 대기 ' + annTotal + '건</h2>' +
+      '<span>확인일 ' + annDates.length + '일</span></div>' + groups;
+  }
+
+  function updateTabs() {
+    var tabs = document.querySelectorAll('.tab');
+    for (var i = 0; i < tabs.length; i++) {
+      var on = tabs[i].getAttribute('data-filter') === filter;
+      tabs[i].classList.toggle('is-active', on);
+      tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+    }
+  }
+
+  function renderAll() {
+    renderSummary();
+    renderMonths();
+    renderFilterList();
+    updateTabs();
+  }
+
+  /* ---------------- events ---------------- */
+  nEl('tabs').addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.tab') : null;
+    if (!btn) return;
+    var f = btn.getAttribute('data-filter');
+    if (f === filter) return;
+    filter = f;
+    selected = null;
+    renderAll();
+    var top = tabs.getBoundingClientRect().top + window.pageYOffset - 1;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  });
+
+  document.querySelectorAll('.sum-card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      filter = card.getAttribute('data-jump') === 'red' ? 'red' : 'blue';
+      selected = null;
+      renderAll();
+      var first = document.querySelector('.cal-card');
+      if (first) {
+        var y = first.getBoundingClientRect().top + window.pageYOffset - 54;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    });
+  });
+
+  document.querySelectorAll('.grid').forEach(function (grid) {
+    grid.addEventListener('click', function (e) {
+      var cell = e.target.closest ? e.target.closest('.cell[data-date]') : null;
+      if (!cell) return;
+      var k = cell.getAttribute('data-date');
+      selected = (selected === k) ? null : k;
+      renderMonths();
+      if (selected) {
+        var mk = selected.slice(0, 7);
+        var det = nEl('detail-' + mk);
+        if (det && det.scrollIntoView) {
+          window.setTimeout(function () {
+            det.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 30);
+        }
+      }
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest || !e.target.closest('.dclose')) return;
+    selected = null;
+    renderMonths();
+  });
+
+  /* sticky tab shadow */
+  var tabs = nEl('tabs');
+  function onScroll() {
+    var stuck = tabs.getBoundingClientRect().top <= 0.5;
+    tabs.classList.toggle('is-stuck', stuck);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  renderAll();
+  onScroll();
+})();
+</script>
+</body>
+</html>
