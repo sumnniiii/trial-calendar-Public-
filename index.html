@@ -739,7 +739,7 @@ h1 .thin{color:var(--ink-2);font-weight:700}
   function monthSub(y, m) {
     var prefix = y + '-' + pad2(m) + '-';
     if (filter === 'red') {
-      var c = deadDates.filter(function (k) { return k.indexOf(prefix) === 0; }).length;
+      var c = DATA.deadlines.filter(function (d) { return d.date.indexOf(prefix) === 0; }).length;
       return '리뷰 마감 ' + c + '곳';
     }
     if (filter === 'blue') {
